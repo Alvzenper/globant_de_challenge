@@ -1,0 +1,18 @@
+# Python / venv
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache/
+
+# IDE
+.vscode/
+
+# DB/archivos locales
+app.db
+*.sqlite3
+
+# Env / credenciales
+.env
+*.env
