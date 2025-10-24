@@ -27,3 +27,10 @@ class EmployeeBatchIn(BaseModel):
             raise ValueError("batch size must be between 1 and 1000")
         return v
 
+        
+class HiredEmployeeCreate(BaseModel):
+    id: int
+    name: str
+    datetime: datetime
+    department_id: int
+    job_id: int
