@@ -11,13 +11,31 @@ from .. import models
 router = APIRouter(prefix="/upload", tags=["upload"])
 
 def _read_csv(file: UploadFile, expected_cols: list[str]) -> pd.DataFrame:
+
+    exp = [c.strip() for c in expected_cols]
+
     try:
-        df = pd.read_csv(file.file, header=None, names=expected_cols)
+        file.file.seek(0)
+        df = pd.read_csv(file.file)
+        cols = [str(c).strip() for c in df.columns]
+        if cols == exp:
+            return df[expected_cols] 
+
+        file.file.seek(0)
+        df = pd.read_csv(file.file, header=None)
+        df.columns = expected_cols
+
+
+        first_row_as_list = [str(x).strip().lower() for x in df.iloc[0].tolist()]
+        if first_row_as_list == [c.lower() for c in exp]:
+            df = df.iloc[1:].reset_index(drop=True)
+
+        if [c.strip() for c in df.columns] != exp:
+            raise ValueError(f"CSV must have columns {expected_cols} in this order")
+
+        return df
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Invalid CSV: {e}")
-    if set(df.columns) != set(expected_cols):
-        raise HTTPException(status_code=400, detail=f"CSV must have columns {expected_cols} (no header)")
-    return df
 
 @router.post("/departments")
 def upload_departments(file: UploadFile = File(...), db: Session = Depends(get_db)):
@@ -66,7 +84,6 @@ def upload_hired_employees(file: UploadFile = File(...), db: Session = Depends(g
     df = _read_csv(file, ["id", "name", "datetime", "department_id", "job_id"])
     inserted, skipped, fk_errors = 0, 0, 0
 
-    # Parse types
     def parse_dt(x):
         try:
             return pd.to_datetime(x, utc=False, format=None)
@@ -78,12 +95,10 @@ def upload_hired_employees(file: UploadFile = File(...), db: Session = Depends(g
 
     try:
         for _, r in df.iterrows():
-            # Minimal validation
             if pd.isna(r["id"]) or not r["name"] or pd.isna(r["datetime"]) or pd.isna(r["department_id"]) or pd.isna(r["job_id"]):
                 skipped += 1
                 continue
 
-            # FK check
             dep = db.execute(select(models.Department.id).where(models.Department.id == int(r["department_id"]))).scalar_one_or_none()
             job = db.execute(select(models.Job.id).where(models.Job.id == int(r["job_id"]))).scalar_one_or_none()
             if dep is None or job is None:

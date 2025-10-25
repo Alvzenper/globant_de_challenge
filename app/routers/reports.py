@@ -14,10 +14,10 @@ H as (select *,
 D as (select * from departments)
 select 
 D.department, J.job,
-case when H.month BETWEEN 1 AND 3 then 1 else 0 end as Q1, 
-case when H.month BETWEEN 4 AND 6 then 1 else 0 end as Q2 , 
-case when H.month BETWEEN 7 AND 9 then 1 else 0 end as Q3, 
-case when H.month BETWEEN 10 AND 12 then 1 else 0 end as Q4 
+SUM(CASE WHEN H.month BETWEEN 1 AND 3  THEN 1 ELSE 0 END) AS Q1, 
+SUM(CASE WHEN H.month BETWEEN 4 AND 6  THEN 1 ELSE 0 END) AS Q2, 
+SUM(CASE WHEN H.month BETWEEN 7 AND 9  THEN 1 ELSE 0 END) AS Q3, 
+SUM(CASE WHEN H.month BETWEEN 10 AND 12 THEN 1 ELSE 0 END) AS Q4 
 from H
 join J on J.id = H.job_id
 join D on D.id = H.department_id

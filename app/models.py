@@ -1,10 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Index
 from sqlalchemy.orm import relationship
 from .database import Base
-
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Index
-from sqlalchemy.orm import relationship
-from .database import Base
+from datetime import datetime
+from sqlalchemy.orm import validates
 
 class Department(Base):
     __tablename__ = "departments"
@@ -16,17 +14,27 @@ class Job(Base):
     id = Column(Integer, primary_key=True, index=True)
     job = Column(String, nullable=False, unique=True)
 
-class Employee(Base):
+class HiredEmployee(Base):  
     __tablename__ = "hired_employees"
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    datetime = Column(DateTime, nullable=False)
-    department_id = Column(Integer, ForeignKey("departments.id"), nullable=False, index=True)
-    job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False, index=True)
+    name = Column(String)
+    datetime = Column(DateTime, nullable=False) 
+    department_id = Column(Integer, ForeignKey("departments.id"))
+    job_id = Column(Integer, ForeignKey("jobs.id"))
 
-    department = relationship("Department")
-    job = relationship("Job")
+    @validates("datetime")
+    def _coerce_datetime(self, key, value):
+        if isinstance(value, str):
+            try:
+                return datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
+            except ValueError:
+                pass
+            try:
+                from dateutil import parser
+                return parser.parse(value)
+            except Exception:
+                pass
+        return value
 
-
-Index("ix_employee_datetime", Employee.datetime)
-Index("ix_employee_dept_job", Employee.department_id, Employee.job_id)
+Index("ix_employee_datetime", HiredEmployee.datetime)
+Index("ix_employee_dept_job", HiredEmployee.department_id, HiredEmployee.job_id)
