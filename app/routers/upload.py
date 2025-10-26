@@ -105,12 +105,12 @@ def upload_hired_employees(file: UploadFile = File(...), db: Session = Depends(g
                 fk_errors += 1
                 continue
 
-            exists = db.execute(select(models.Employee).where(models.Employee.id == int(r["id"]))).scalar_one_or_none()
+            exists = db.execute(select(models.HiredEmployee).where(models.HiredEmployee.id == int(r["id"]))).scalar_one_or_none()
             if exists:
                 skipped += 1
                 continue
 
-            db.add(models.Employee(
+            db.add(models.HiredEmployee(
                 id=int(r["id"]),
                 name=r["name"],
                 datetime=pd.to_datetime(r["datetime"]).to_pydatetime(),
