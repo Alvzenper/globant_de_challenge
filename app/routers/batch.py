@@ -8,6 +8,7 @@ from ..schemas import EmployeeBatchIn
 
 router = APIRouter(prefix="/employees", tags=["employees"])
 
+
 @router.post("/batch")
 def insert_employees_batch(payload: EmployeeBatchIn, db: Session = Depends(get_db)):
     # Preload valid FKs to avoid N queries
@@ -19,24 +20,36 @@ def insert_employees_batch(payload: EmployeeBatchIn, db: Session = Depends(get_d
         ids_in_request = set()
         for e in payload.employees:
             if e.id in ids_in_request:
-                raise HTTPException(status_code=400, detail=f"Duplicate id in request: {e.id}")
+                raise HTTPException(
+                    status_code=400, detail=f"Duplicate id in request: {e.id}"
+                )
             ids_in_request.add(e.id)
 
         # Existing ids in DB
         existing = {
-            x[0] for x in db.execute(
-                select(models.Employee.id).where(models.Employee.id.in_(list(ids_in_request)))
+            x[0]
+            for x in db.execute(
+                select(models.Employee.id).where(
+                    models.Employee.id.in_(list(ids_in_request))
+                )
             ).all()
         }
         if existing:
-            raise HTTPException(status_code=400, detail=f"IDs already exist in DB: {sorted(existing)[:5]}{'...' if len(existing)>5 else ''}")
+            raise HTTPException(
+                status_code=400,
+                detail=f"IDs already exist in DB: {sorted(existing)[:5]}{'...' if len(existing)>5 else ''}",
+            )
 
         # FK validation
         for e in payload.employees:
             if e.department_id not in dep_ids:
-                raise HTTPException(status_code=400, detail=f"Unknown department_id: {e.department_id}")
+                raise HTTPException(
+                    status_code=400, detail=f"Unknown department_id: {e.department_id}"
+                )
             if e.job_id not in job_ids:
-                raise HTTPException(status_code=400, detail=f"Unknown job_id: {e.job_id}")
+                raise HTTPException(
+                    status_code=400, detail=f"Unknown job_id: {e.job_id}"
+                )
 
         # Insert all in one transaction
         objs = [

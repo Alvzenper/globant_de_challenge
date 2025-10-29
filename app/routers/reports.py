@@ -5,7 +5,8 @@ from app.database import get_db
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 
-quarter_2021 = text("""
+quarter_2021 = text(
+    """
 with  
 J as (select * from jobs j ) ,
 H as (select *,  
@@ -24,9 +25,11 @@ join D on D.id = H.department_id
 WHERE H.year = '2021'
 group by D.department, J.job
 order by D.department, J.job
- """)
+ """
+)
 
-depts_above_mean = text("""
+depts_above_mean = text(
+    """
  WITH hires_per_department AS (
     SELECT 
         department_id, 
@@ -44,12 +47,15 @@ JOIN departments d ON d.id = h.department_id
 WHERE h.hires > (SELECT AVG(hires) FROM hires_per_department)
 ORDER BY h.hires DESC;
 
- """)
+ """
+)
+
 
 @router.get("/hired-by-quarter-2021")
 def hired_by_quarter(db: Session = Depends(get_db)):
     rows = db.execute(quarter_2021).mappings().all()
     return [dict(r) for r in rows]
+
 
 @router.get("/departments-above-mean-2021")
 def departments_above_mean(db: Session = Depends(get_db)):

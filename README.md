@@ -100,22 +100,22 @@ Its design reflects a focus on **data quality, modularity, and automated deploym
 
 
 1. Build the container
-docker build -t globant-de-api .
+`docker build -t globant-de-api` .
 2. Login to Azure
-az login
-az acr login --name <your-acr-name>
+`az login`
+`az acr login --name <>`
 3. Push to ACR
-docker tag globant-de-api <your-acr-name>.azurecr.io/globant-de-api:v1
-docker push <your-acr-name>.azurecr.io/globant-de-api:v1
+`docker tag globant-de-api <>.azurecr.io/globant-de-api:v1`
+`docker push <>.azurecr.io/globant-de-api:v1`
 4. Create Azure Container Instance
-az container create \
-  --resource-group <resource-group> \
-  --name globant-de-api \
-  --image <your-acr-name>.azurecr.io/globant-de-api:v1 \
-  --registry-login-server <your-acr-name>.azurecr.io \
-  --registry-username <> \
-  --registry-password <> \
-  --ports 80
+`az container create \`
+  `--resource-group <resource-group> \`
+  `--name globant-de-api \`
+  `--image <>.azurecr.io/globant-de-api:v1 \`
+  `--registry-login-server <>.azurecr.io \`
+  `--registry-username <> \`
+  `--registry-password <> \`
+ ` --ports 80`
 5. Access the API
 - Endpoint: http://<azure-ip>/docs
 - FastAPI Swagger UI automatically available for testing.
