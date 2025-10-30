@@ -117,7 +117,7 @@ az container create \
   --registry-password <> \
   --ports 80
 5. Access the API
-- Endpoint: http://4.248.19.55:8000/docs#/
+- Endpoint: http://52.235.39.151:8000/docs
 - FastAPI Swagger UI automatically available for testing.
 
 ---
