@@ -77,7 +77,7 @@ Its design reflects a focus on **data quality, modularity, and automated deploym
                        │
                        ▼
              ┌─────────────────────┐
-             │ Pydantic Validation │
+             │  Pydantic Validation│
              └────────────┬────────┘
                           │
                           ▼
@@ -98,32 +98,27 @@ Its design reflects a focus on **data quality, modularity, and automated deploym
 ---
  ## ☁️ Cloud Deployment (Azure)
 
-```bash
-# 1. Build the container
+
+1. Build the container
 docker build -t globant-de-api .
-
-# 2. Login to Azure
+2. Login to Azure
 az login
-az acr login --name <acr>
-
-# 3. Push to ACR
-docker tag globant-de-api <acr>.azurecr.io/globant-de-api:v1
-docker push <acr>.azurecr.io/globant-de-api:v1
-
-# 4. Create Azure Container Instance
+az acr login --name <your-acr-name>
+3. Push to ACR
+docker tag globant-de-api <your-acr-name>.azurecr.io/globant-de-api:v1
+docker push <your-acr-name>.azurecr.io/globant-de-api:v1
+4. Create Azure Container Instance
 az container create \
   --resource-group <resource-group> \
   --name globant-de-api \
-  --image <acr>.azurecr.io/globant-de-api:v1 \
-  --registry-login-server <acr>.azurecr.io \
-  --registry-username <username> \
-  --registry-password <password> \
+  --image <your-acr-name>.azurecr.io/globant-de-api:v1 \
+  --registry-login-server <your-acr-name>.azurecr.io \
+  --registry-username <> \
+  --registry-password <> \
   --ports 80
-
-# 5. Access the API
-# Endpoint: http://4.248.19.55:8000/docs#
-# FastAPI Swagger UI automatically available for testing.
-
+5. Access the API
+- Endpoint: http://4.248.19.55:8000/docs#/
+- FastAPI Swagger UI automatically available for testing.
 
 ---
 
